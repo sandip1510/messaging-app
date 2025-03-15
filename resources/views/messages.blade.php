@@ -1,5 +1,4 @@
 <x-app-layout>
-
 @section('content')
 <div class="container mx-auto">
     <h2 class="text-2xl font-bold mb-4">Messages</h2>
@@ -7,7 +6,10 @@
     <form id="messageForm" class="mb-4">
         @csrf
         <div class="flex">
-            <input type="text" id="receiver_id" placeholder="Receiver ID" class="border rounded p-2 mr-2" required>
+            <select id="receiver_id" class="border rounded p-2 mr-2" required>
+                <option value="">Select Receiver</option>
+                <!-- Users will be populated here -->
+            </select>
             <input type="text" id="message" placeholder="Type your message..." class="border rounded p-2 flex-grow" required>
             <button type="submit" class="bg-blue-500 text-white rounded p-2 ml-2">Send</button>
         </div>
@@ -25,14 +27,17 @@
     document.addEventListener('DOMContentLoaded', function () {
         const messageForm = document.getElementById('messageForm');
         const messageList = document.getElementById('messageList');
+        const receiverSelect = document.getElementById('receiver_id');
 
+        // Fetch users on page load
+        fetchUsers();
         // Fetch messages on page load
         fetchMessages();
 
         messageForm.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const receiverId = document.getElementById('receiver_id').value;
+            const receiverId = receiverSelect.value;
             const message = document.getElementById('message').value;
 
             try {
@@ -71,8 +76,23 @@
                 console.error('Error fetching messages:', error);
             }
         }
+
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/users');
+                const users = await response.json();
+
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.name; // Assuming 'name' is the field you want to display
+                    receiverSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        }
     });
 </script>
-
-
+@endsection
 </x-app-layout>

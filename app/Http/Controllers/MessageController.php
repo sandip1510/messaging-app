@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\User; // Import the User model
 
 class MessageController extends Controller
 {
@@ -36,5 +36,11 @@ class MessageController extends Controller
         $messagesArray = array_map('json_decode', explode(PHP_EOL, trim($messages)));
 
         return response()->json($messagesArray);
+    }
+
+    public function getUsers()
+    {
+        // Fetch all users except the authenticated user
+        return User::where('id', '!=', Auth::id())->get(['id', 'name']);
     }
 }
